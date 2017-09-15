@@ -36,22 +36,106 @@ var chat = {
             }
         });
     },
-    agentlist: function () {
-
+    agentsession: function (accountnumber) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession?v=1&NC=true",
+                method: "POST",
+                body: '{ "loginData": ""  }',
+                token: ""
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("agentsession Error (API)")
+            }
+        });
     },
-    agentdetail: function() {
-
+    chatlist: function () {  // ini pakai API di halaman https://developers.liveperson.com/agent-retrieve-data.html
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/login?v=1.3",
+                method: "POST",
+                body: "",
+                token: ""
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
     },
-    chatlist: function () {
-
+    incomingchatrequest: function (accountnumber, agentsessionid) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/incomingRequests?v=1&NC=true",
+                method: "POST",
+                body: "",
+                token: ""
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
     },
-    sendmessage: function () {
-
+    sendmessage: function (accountnumber, agentsessionid, chatid) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chat/" + chatid + "/info/events?v=1&NC=true",
+                method: "POST",
+                body: '{ "event": { "@type": "line", "text": "<div dir="ltr" style="direction: ltr; text-align: left;">this is a line of text</div>", "textType": "html"  }',
+                token: ""
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
     },
-    receivemessage: function () {
-
+    chatsessions: function (accountnumber, agentsessionid) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "chatSessions?v=1&NC=true",
+                method: "POST",
+                body: "",
+                token: ""
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
     },
-    checkpending: function () {
-
+    retrievevisitorname: function (accountnumber, agentsessionid, chatid) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chat/" + chatid + "/info/visitorName?v=1&NC=true",
+                method: "POST",
+                body: "",
+                token: ""
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("retrievevisitorname Error (API)")
+            }
+        });
     }
 }
