@@ -1,138 +1,57 @@
-﻿class LPUtils {
-    static getDomain(account, name) {
-        const domains = account.startsWith("le") ? "hc1n.dev.lprnd.net" : "adminlogin.liveperson.net";
-        return new Promise((res, rej) => $.ajax({
-            url: `https://${domains}/csdr/account/${account}/service/${name}/baseURI.lpCsds?version=1.0`,
-            jsonp: "cb",
-            jsonpCallback: "domainCallback",
-            cache: true,
-            dataType: "jsonp",
-            success: data => res(data.ResultSet.lpData[0].lpServer),
-            error: (e, text) => rej(text)
-        }));
-    }
+﻿$(document).ready(function () {
+    $("#panelLogin").show();
+    $("#panelTable").hide();
 
-    static agentProfile(account, agentID) {
-        return new Promise((res, rej) => this.getDomain(account, "acCdnDomain").then(accdnDomain => $.ajax({
-            url: `https://${accdnDomain}/api/account/${account}/configuration/le-users/users/${agentID}`,
-            jsonp: "cb",
-            jsonpCallback: "apCallback",
-            cache: true,
-            dataType: "jsonp",
-            success: accdnResp => res(accdnResp)
-        })))
-    };
+    $("#btn-login").unbind().click(function () {
 
-    static signup(account) {
-        return new Promise((res, rej) => this.getDomain(account, "idp").then(idpDomain => $.ajax({
-            url: `https://${idpDomain}/api/account/${account}/signup.jsonp`,
-            jsonp: "callback",
-            dataType: "jsonp",
-            success: idpResp => res(idpResp.jwt)
-        })))
-    };
-
-    // fetch jwt from localstorage or create one
-    static getJWT(account) {
-        const localJWT = localStorage.getItem(`${account}-jwt`);
-        if (localJWT)
-            return Promise.resolve(localJWT);
-        else
-            return this.signup(account).then(newJWT => {
-                localStorage.setItem(`${account}-jwt`, newJWT);
-                return Promise.resolve(newJWT);
-            });
-    }
-
-    static clearJWT(account) {
-        localStorage.removeItem(`${account}-jwt`);
-    }
-}
-// LPUtils.getDomain("qa20971604", "idp").then(r => console.log(r));
-// LPUtils.signup("qa20971604").then(r => console.log(r));
-
-class LPWs {
-    static connect(url) {
-        return new LPWs(url)._connect();
-    }
-
-    static connectDebug(url) {
-        return new LPWs(url, true)._connect();
-    }
-
-    constructor(url, debug) {
-        this.reqs = {};
-        this.subs = [];
-        this.url = url;
-        this.debug = debug;
-    }
-
-    _connect() {
-        return new Promise((resolve, reject) => {
-            var ws = new WebSocket(this.url);
-            this.ws = ws;
-            ws.onopen = () => resolve(this);
-            ws.onmessage = (msg) => this.onmessage(msg);
-            ws.onclose = (evt) => {
-                this.ws = null;
-                reject(evt);
-            };
-        });
-    }
-
-    request(type, body, headers) {
-        return new Promise((resolve, reject) => {
-            var obj = {
-                "kind": "req",
-                "type": type,
-                "body": body || {},
-                "id": Math.floor((Math.random() * 1e9)),
-                "headers": headers
-            };
-            this.reqs[obj.id] = (type, code, body) => resolve({
-                type: type,
-                code: code,
-                body: body
-            });
-            var str = JSON.stringify(obj);
-            if (this.debug) console.log("sending: " + str);
-            this.ws.send(str);
-        })
-    }
-
-    onNotification(filterFunc, onNotification) {
-        this.subs.push({
-            filter: filterFunc,
-            cb: onNotification
-        });
-    }
-
-    toFuncName(reqType) {
-        var str = reqType.substr(1 + reqType.lastIndexOf('.'));
-        return str.charAt(0).toLowerCase() + str.slice(1);
-    }
-
-    registerRequests(arr) {
-        arr.forEach(reqType=>this[this.toFuncName(reqType)] = (body, headers) =>this.request(reqType, body, headers));
-    }
-
-    onmessage(msg) {
-        if (this.debug) console.log("recieved: " + msg.data);
-        var obj = JSON.parse(msg.data);
-        if (obj.kind == "resp") {
-            var id = obj.reqId;
-            delete obj.reqId;
-            delete obj.kind;
-            this.reqs[id].call(this, obj.type, obj.code, obj.body);
-            delete this.reqs[id];
-        } else if (obj.kind == "notification") {
-            this.subs.forEach(function (sub) {
-                if (sub.filter.call(this, obj)) {
-                    sub.cb.call(this, obj.body);
-                };
-            });
+        if ($("#tbAccountNumber").val() == "" || $("#tbUsername").val() == "" || $("#tbPassword").val() == "") {
+            alert("please insert detail");
+            return false;
         }
+
+        chat.login($("#tbAccountNumber").val(), $("#tbUsername").val(), $("#tbPassword").val());
+
+        $("#panelLogin").hide();
+        $("#panelTable").show();
+
+        return false;
+    });
+})
+
+var chat = {
+    login: function (accountnumber, username, password) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/login?v=1.3",
+                method: "POST",
+                body: '{ "username" : "' + username + '", "password" : "' + password + '"  }',
+                token: ""
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
+    },
+    agentlist: function () {
+
+    },
+    agentdetail: function() {
+
+    },
+    chatlist: function () {
+
+    },
+    sendmessage: function () {
+
+    },
+    receivemessage: function () {
+
+    },
+    checkpending: function () {
+
     }
 }
-
-// LPWs.connect("wss://echo.websocket.org").then(lpws => console.log(`lpws was opened.`));
