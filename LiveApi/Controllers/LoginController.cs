@@ -11,9 +11,8 @@ namespace LiveApi.Controllers
 {
     public class LoginController : Controller
     {
-        // GET api/<controller>
         [HttpPost]
-        public ActionResult TestAPI(string url, string method, string token, string body)
+        public ActionResult LEApi(string url, string method, string token, string body)
         {
             string json = "";
             try
