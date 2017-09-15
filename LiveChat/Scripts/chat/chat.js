@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿var globalToken = "";
+
+$(document).ready(function () {
     $("#panelLogin").show();
     $("#panelTable").hide();
 
@@ -28,46 +30,30 @@ var chat = {
                 body: '{ "username" : "' + username + '", "password" : "' + password + '"  }',
                 token: ""
             },
-            success: function (data) {
+            success: function (data, xhr) {
+                console.log(xhr.status);
+
                 var parsedData = JSON.parse(data);
-                console.log(parsedData);
 
                 $("#spanName").text(parsedData.config.loginName);
 
-                chat.agentsession(accountnumber);
-                
-                //chat.agentlist(accountnumber);
+                globalToken = parsedData.bearer;
+
+                chat.agentsession(accountnumber, globalToken);
             },
             error: function () {
                 console.log("Login Error (API)")
             }
         });
     },
-    agentlist: function (accountnumber) {
-        $.ajax({
-            url: "/LiveChat/api/v1/chats",
-            data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/configuration/le-users/users",
-                method: "GET",
-                body: "",
-                token: ""
-            },
-            success: function (data) {
-                console.log(JSON.parse(data));
-            },
-            error: function () {
-                console.log("Login Error (API)")
-            }
-        });
-    },
-    agentsession: function (accountnumber) {
+    agentsession: function (accountnumber, token) {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
                 url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession?v=1&NC=true",
                 method: "POST",
                 body: '{ "loginData": ""  }',
-                token: ""
+                token: token
             },
             success: function (data) {
                 console.log(JSON.parse(data));
