@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="col-sm-12 box-fix">
+    <form id="panelLogin">
+        <div class="panel panel-default">
+
+            <div class="panel-heading text-bold">SEARCH CRITERIA</div>
+
+            <div class="panel-body">
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <div class="form-group margin-bottom-5">
+                                <label class="col-xs-4 control-label ">Account Number : </label>
+                                <div class="col-xs-6">
+                                    <input class="k-input k-textbox" type="text" id="tbAccountNumber" />
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-5">
+                                <label class="col-xs-4 control-label ">Username : </label>
+                                <div class="col-xs-6">
+                                    <input class="k-input k-textbox" type="text" id="tbUsername" />
+                                </div>
+                            </div>
+                            <div class="form-group margin-bottom-5">
+                                <label class="col-xs-4 control-label ">Password : </label>
+                                <div class="col-xs-6">  
+                                    <input class="k-input k-textbox" type="password" id="tbPassword" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer" style="padding:10px">
+                <div class="text-center">
+                    <button class="k-button" id="btn-login"><i class="fa fa-search" aria-hidden="true"></i> Login</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form id="panelTable">
+        
+    </form>
+</div>
+
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/chat/chat.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#btn-login").unbind().click(function () {
+            LPUtils.getDomain($("#tbAccountNumber").val(), "agentVep");
+
+            return false;
+        }); 
+    })
+</script>
