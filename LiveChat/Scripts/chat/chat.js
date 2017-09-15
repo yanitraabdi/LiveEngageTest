@@ -1,33 +1,18 @@
-﻿var LPUtils = {
-    getDomain : function(account, name) {
-        var domains = "api.liveperson.net";
-        $.ajax({
-            url: "https://" + domains + "/csdr/account/" + account + "/service/" + name + "/baseURI.json?version=1.0",
-            //jsonp: "cb",
-            jsonpCallback: "setCallback",
-            type: "GET",
-            //crossDomain: true,
+﻿class LPUtils {
+    static getDomain(account, name) {
+        const domains = account.startsWith("le") ? "hc1n.dev.lprnd.net" : "adminlogin.liveperson.net";
+        return new Promise((res, rej) => $.ajax({
+            url: `https://${domains}/csdr/account/${account}/service/${name}/baseURI.lpCsds?version=1.0`,
+            jsonp: "cb",
+            jsonpCallback: "domainCallback",
+            cache: true,
             dataType: "jsonp",
-            beforeSend: setHeader,
-            success: function(data) {
-                console.log(data);
-                //LPUtils.login(account, domains)
-            },
-            error: function() {
-                console.log("error get domain")
-            }
-        });
-    },
-    login: function (account, logindomain) {
-        $.ajax({
-            url: "https://" + logindomain + "/api/account/" + account + "/login?v=1.3",
-            jsonp: "callback",
-            dataType: "jsonp",
-            success: idpResp => res(idpResp.jwt)
-        });
-    },
+            success: data => res(data.ResultSet.lpData[0].lpServer),
+            error: (e, text) => rej(text)
+        }));
+    }
 
-    agentProfile: function(account, agentID) {
+    static agentProfile(account, agentID) {
         return new Promise((res, rej) => this.getDomain(account, "acCdnDomain").then(accdnDomain => $.ajax({
             url: `https://${accdnDomain}/api/account/${account}/configuration/le-users/users/${agentID}`,
             jsonp: "cb",
@@ -36,19 +21,19 @@
             dataType: "jsonp",
             success: accdnResp => res(accdnResp)
         })))
-    },
+    };
 
-    signup: function(account) {
+    static signup(account) {
         return new Promise((res, rej) => this.getDomain(account, "idp").then(idpDomain => $.ajax({
             url: `https://${idpDomain}/api/account/${account}/signup.jsonp`,
             jsonp: "callback",
             dataType: "jsonp",
             success: idpResp => res(idpResp.jwt)
         })))
-    },
+    };
 
     // fetch jwt from localstorage or create one
-    getJWT: function(account) {
+    static getJWT(account) {
         const localJWT = localStorage.getItem(`${account}-jwt`);
         if (localJWT)
             return Promise.resolve(localJWT);
@@ -57,9 +42,9 @@
                 localStorage.setItem(`${account}-jwt`, newJWT);
                 return Promise.resolve(newJWT);
             });
-    },
+    }
 
-    clearJWT: function(account) {
+    static clearJWT(account) {
         localStorage.removeItem(`${account}-jwt`);
     }
 }
@@ -148,15 +133,6 @@ class LPWs {
             });
         }
     }
-}
-
-function setHeader(xhr) {
-    //xhr.setRequestHeader('Authorization', token);
-    xhr.setRequestHeader('Accept', 'application/json');
-}
-
-function setCallback(data) {
-    console.log(data);
 }
 
 // LPWs.connect("wss://echo.websocket.org").then(lpws => console.log(`lpws was opened.`));
