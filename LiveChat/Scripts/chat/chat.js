@@ -29,6 +29,30 @@ var chat = {
                 token: ""
             },
             success: function (data) {
+                var parsedData = JSON.parse(data);
+                console.log(parsedData);
+
+                $("#spanName").text(parsedData.config.loginName);
+
+                chat.agentsession(accountnumber);
+                
+                //chat.agentlist(accountnumber);
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
+    },
+    agentlist: function (accountnumber) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/configuration/le-users/users",
+                method: "GET",
+                body: "",
+                token: ""
+            },
+            success: function (data) {
                 console.log(JSON.parse(data));
             },
             error: function () {
@@ -58,7 +82,7 @@ var chat = {
             url: "/LiveChat/api/v1/chats",
             data: {
                 url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/login?v=1.3",
-                method: "POST",
+                method: "GET",
                 body: "",
                 token: ""
             },
@@ -75,7 +99,7 @@ var chat = {
             url: "/LiveChat/api/v1/chats",
             data: {
                 url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/incomingRequests?v=1&NC=true",
-                method: "POST",
+                method: "GET",
                 body: "",
                 token: ""
             },
@@ -109,7 +133,7 @@ var chat = {
             url: "/LiveChat/api/v1/chats",
             data: {
                 url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "chatSessions?v=1&NC=true",
-                method: "POST",
+                method: "GET",
                 body: "",
                 token: ""
             },
@@ -126,7 +150,7 @@ var chat = {
             url: "/LiveChat/api/v1/chats",
             data: {
                 url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chat/" + chatid + "/info/visitorName?v=1&NC=true",
-                method: "POST",
+                method: "GET",
                 body: "",
                 token: ""
             },
