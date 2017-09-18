@@ -1,5 +1,5 @@
 ﻿var globalToken = "";
-var test = "";
+var agentSessionId = "";
 
 $(document).ready(function () {
     $("#panelLogin").show();
@@ -57,22 +57,22 @@ var chat = {
             success: function (data) {
                 var parsedData = JSON.parse(data);
 
-                test = parsedData.agentSessionLocation.link["@href"].split("/")[parsedData.agentSessionLocation.link["@href"].split("/").length - 1];
+                agentSessionId = parsedData.agentSessionLocation.link["@href"].split("/")[parsedData.agentSessionLocation.link["@href"].split("/").length - 1];
 
-                console.log(test);
+                console.log(agentSessionId);
 
-                //var agentSessionId = 
+                chat.chatsessions(accountnumber, agentSessionId);
             },
             error: function () {
                 console.log("agentsession Error (API)")
             }
         });
     },
-    chatlist: function () {  // ini pakai API di halaman https://developers.liveperson.com/agent-retrieve-data.html
+    chatlist: function (accountnumber, chatSessionKeys) {  // ini pakai API di halaman https://developers.liveperson.com/agent-retrieve-data.html
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/login?v=1.3",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSessionId + "/chat?chatSessionKeys=" + chatSessionKeys,
                 method: "GET",
                 body: "",
                 token: ""
@@ -123,13 +123,26 @@ var chat = {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "chatSessions?v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chatSessions?v=1&NC=true",
                 method: "GET",
                 body: "",
-                token: ""
+                token: globalToken
             },
             success: function (data) {
-                console.log(JSON.parse(data));
+                var parsedData = JSON.parse(data);
+
+                console.log(parsedData);
+
+                var arrChatSession = [];
+
+                $.each(parsedData.chatSessions.chatSession, function(i, obj){
+                    //arrChatSession.push(parsedData.chatSessions.chatSessions[i].chatSessionKey);
+                    console.log(obj);
+                })
+
+                //console.log(arrChatSession);
+
+
             },
             error: function () {
                 console.log("Login Error (API)")
