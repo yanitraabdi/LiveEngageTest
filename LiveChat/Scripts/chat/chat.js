@@ -1,5 +1,6 @@
 ﻿var globalToken = "";
 var agentSessionId = "";
+var accountNumber = "";
 
 $(document).ready(function () {
     $("#panelLogin").show();
@@ -68,17 +69,54 @@ var chat = {
             }
         });
     },
+    chatsessions: function (accountnumber, agentsessionid) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chatSessions?v=1&NC=true",
+                method: "GET",
+                body: "",
+                token: globalToken
+            },
+            success: function (data) {
+                var parsedData = JSON.parse(data);
+
+                console.log(parsedData);
+
+                var arrChatSession = [];
+
+                $.each(parsedData.chatSessions.chatSession, function (i, obj) {
+                    arrChatSession.push(obj.chatSessionKey);
+                })
+
+                var joinArray = arrChatSession.join(",")
+
+                chat.chatlist(accountnumber, joinArray);
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
+    },
     chatlist: function (accountnumber, chatSessionKeys) {  // ini pakai API di halaman https://developers.liveperson.com/agent-retrieve-data.html
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSessionId + "/chat?chatSessionKeys=" + chatSessionKeys,
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSessionId + "/chat?chatSessionKeys=" + chatSessionKeys + "&v=1&NC=true",
                 method: "GET",
                 body: "",
-                token: ""
+                token: globalToken
             },
             success: function (data) {
+                var parsedData = JSON.parse(data);
+
                 console.log(JSON.parse(data));
+
+                var divChatList = document.getElementById("divChatList");
+
+                $.each(parsedData.chats.chat, function(i, obj) {
+                    divChatList.innerHTML += '<li class="left clearfix" id="' + obj.info.chatSessionKey + '"><span class="chat-img pull-left"><img src="http://www.joomilak.com/media/com_easydiscuss/images/default_avatar.png" alt="User Avatar" class="img-circle"></span><div class="chat-body clearfix" ><div class="header_sec"><strong class="primary-font">' + obj.info.visitorName + '</strong> <strong class="pull-right">' + moment(obj.info.lastUpdate).format("HH:mm") + '</strong></div><div class="contact_sec"><strong class="primary-font">(123) 123-456</strong> <span class="badge pull-right">3</span></div>';
+                });                
             },
             error: function () {
                 console.log("Login Error (API)")
@@ -116,53 +154,6 @@ var chat = {
             },
             error: function () {
                 console.log("Login Error (API)")
-            }
-        });
-    },
-    chatsessions: function (accountnumber, agentsessionid) {
-        $.ajax({
-            url: "/LiveChat/api/v1/chats",
-            data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chatSessions?v=1&NC=true",
-                method: "GET",
-                body: "",
-                token: globalToken
-            },
-            success: function (data) {
-                var parsedData = JSON.parse(data);
-
-                console.log(parsedData);
-
-                var arrChatSession = [];
-
-                $.each(parsedData.chatSessions.chatSession, function(i, obj){
-                    //arrChatSession.push(parsedData.chatSessions.chatSessions[i].chatSessionKey);
-                    console.log(obj);
-                })
-
-                //console.log(arrChatSession);
-
-
-            },
-            error: function () {
-                console.log("Login Error (API)")
-            }
-        });
-    },
-    retrievevisitorname: function (accountnumber, agentsessionid, chatid) {
-        $.ajax({
-            url: "/LiveChat/api/v1/chats",
-            data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chat/" + chatid + "/info/visitorName?v=1&NC=true",
-                method: "GET",
-                body: "",
-                token: ""
-            },
-            success: function (data) {
-                console.log(JSON.parse(data));
-            },
-            error: function () {
-                console.log("retrievevisitorname Error (API)")
             }
         });
     }
