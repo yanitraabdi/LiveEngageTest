@@ -73,7 +73,7 @@ var chat = {
                 agentSession = parsedData.agentSessionLocation.link["@href"].split("/")[parsedData.agentSessionLocation.link["@href"].split("/").length - 1];
                 chat.incomingchatrequest(accountnumber, agentSession);
 
-                chat.chatsessions(accountnumber, agentSessionId);
+                chat.chatsessions(accountnumber);
             },
             error: function () {
                 console.log("agentsession Error (API)")
@@ -84,7 +84,7 @@ var chat = {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSessionId + "/chat?chatSessionKeys=" + chatSessionKeys + "&v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSession + "/chat?chatSessionKeys=" + chatSessionKeys + "&v=1&NC=true",
                 method: "GET",
                 body: "",
                 token: globalToken
@@ -96,9 +96,11 @@ var chat = {
 
                 var divChatList = document.getElementById("divChatList");
 
+                $("divChatList").empty();
+
                 $.each(parsedData.chats.chat, function(i, obj) {
                     divChatList.innerHTML += '<li class="left clearfix" id="' + obj.info.chatSessionKey + '"><span class="chat-img pull-left"><img src="http://www.joomilak.com/media/com_easydiscuss/images/default_avatar.png" alt="User Avatar" class="img-circle"></span><div class="chat-body clearfix" ><div class="header_sec"><strong class="primary-font">' + obj.info.visitorName + '</strong> <strong class="pull-right">' + moment(obj.info.lastUpdate).format("HH:mm") + '</strong></div><div class="contact_sec"><strong class="primary-font">(123) 123-456</strong> <span class="badge pull-right">3</span></div>';
-                });                
+                });
             },
             error: function () {
                 console.log("Login Error (API)")
@@ -109,7 +111,7 @@ var chat = {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/incomingRequests?v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSession + "/incomingRequests?v=1&NC=true",
                 method: "GET",
                 body: "",
                 token: globalToken
@@ -136,13 +138,15 @@ var chat = {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/incomingRequests?v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSession + "/incomingRequests?v=1&NC=true",
                 method: "POST",
                 body: "",
                 token: globalToken
             },
             success: function (data) {
                 console.log(JSON.parse(data));
+
+                chat.chatsessions(accountnumber)
             },
             error: function () {
                 console.log("Accept Chat Error (API)")
@@ -153,7 +157,7 @@ var chat = {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chat/" + chatid + "/info/events?v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSession + "/chat/" + chatid + "/info/events?v=1&NC=true",
                 method: "POST",
                 body: '{ "event": { "@type": "line", "text": "<div dir="ltr" style="direction: ltr; text-align: left;">this is a line of text</div>", "textType": "html"  }',
                 token: globalToken
@@ -166,11 +170,40 @@ var chat = {
             }
         });
     },
-    chatsessions: function (accountnumber, agentsessionid) {
+    chatsessions: function (accountnumber) {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chatSessions?v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSession + "/chatSessions?v=1&NC=true",
+                method: "GET",
+                body: "",
+                token: globalToken
+            },
+            success: function (data) {
+                var parsedData = JSON.parse(data);
+
+                console.log(parsedData);
+
+                var arrChatSession = [];
+
+                $.each(parsedData.chatSessions.chatSession, function (i, obj) {
+                    arrChatSession.push(obj.chatSessionKey);
+                })
+
+                var joinArray = arrChatSession.join(",")
+
+                chat.chatlist(accountnumber, joinArray);
+            },
+            error: function () {
+                console.log("Login Error (API)")
+            }
+        });
+    },
+    getchatevent: function (chatSessionKey) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSession + "/chatSessions?v=1&NC=true",
                 method: "GET",
                 body: "",
                 token: globalToken
