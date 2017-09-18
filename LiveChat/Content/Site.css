@@ -183,18 +183,13 @@
             width: 40px;
         }
 
-    .chat_area .chat-body1 {
-        margin-left: 50px;
-    }
-
 .chat-body1 p {
     background: #fbf9fa none repeat scroll 0 0;
     padding: 10px;
 }
 
 .chat_area .admin_chat .chat-body1 {
-    margin-left: 0;
-    margin-right: 50px;
+    margin-left: 200px;
 }
 
 .chat_area li:last-child {
@@ -232,4 +227,14 @@
     background: #428bca none repeat scroll 0 0;
     color: #fff;
     cursor: pointer;
+}
+
+.chat_area ul li .chat-body1 p {
+    background-color: #FDECA9;
+    border: 1px solid #dedede;
+}
+
+.chat_area ul li.admin_chat .chat-body1 p {
+    background-color: #FFF;
+    border: 1px solid #dedede;
 }

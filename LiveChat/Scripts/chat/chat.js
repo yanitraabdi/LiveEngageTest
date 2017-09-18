@@ -29,6 +29,11 @@ $(document).ready(function () {
         chat.acceptchatrequest(accountNumber, agentSession);
         return false;
     });
+
+    $("#btnSend").unbind().click(function () {
+        chat.sendmessage(currentChatId, $("#txtMessage").val());
+        return false;
+    });
 })
 
 var chat = {
@@ -157,20 +162,27 @@ var chat = {
             }
         });
     },
-    sendmessage: function (accountnumber, agentsessionid, chatid) {
+    sendmessage: function (chatid, message) {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentSession + "/chat/" + chatid + "/info/events?v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountNumber + "/agentSession/" + agentSession + "/chat/" + chatid + "/info/events?v=1&NC=true",
                 method: "POST",
-                body: '{ "event": { "@type": "line", "text": "<div dir="ltr" style="direction: ltr; text-align: left;">this is a line of text</div>", "textType": "html"  }',
+                body: '{ "event": { "@type": "line", "text": "' + message + '", "textType": "html"  }',
                 token: globalToken
             },
             success: function (data) {
                 console.log(JSON.parse(data));
+                var parsedData = JSON.parse(data);
+
+                var divChatArea = document.getElementById("divChatArea");
+
+                $.each(parsedData.chats.chat, function (i, obj) {
+                    divChatArea.innerHTML += '<li class="left clearfix admin_chat"><div class="row"><div class="chat-body1 clearfix col-xs-9"><p>' + message + '</p><div class="chat_time pull-left">' + moment().format("HH:mm") + '</div></div></div></li>';
+                });
             },
             error: function () {
-                console.log("Login Error (API)")
+                console.log("Send Message Error (API)")
             }
         });
     },
