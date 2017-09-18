@@ -1,9 +1,16 @@
 ﻿var globalToken = "";
-var test = "";
+var agentSession = "";
+var accountNumber = "";
 
 $(document).ready(function () {
-    $("#panelLogin").show();
-    $("#panelTable").hide();
+    if (globalToken == "" && agentSession == "") {
+        $("#panelLogin").show();
+        $("#panelTable").hide();
+    }
+    else {
+        $("#panelLogin").hide();
+        $("#panelTable").show();
+    }
 
     $("#btn-login").unbind().click(function () {
 
@@ -14,6 +21,11 @@ $(document).ready(function () {
 
         chat.login($("#tbAccountNumber").val(), $("#tbUsername").val(), $("#tbPassword").val());
 
+        return false;
+    });
+
+    $("#btn-accept-chat").unbind().click(function () {
+        chat.acceptchatrequest(accountNumber, agentSession);
         return false;
     });
 })
@@ -34,6 +46,7 @@ var chat = {
                 $("#spanName").text(parsedData.config.loginName);
 
                 globalToken = parsedData.bearer;
+                accountNumber = accountnumber;
 
                 chat.agentsession(accountnumber, globalToken);
 
@@ -57,11 +70,9 @@ var chat = {
             success: function (data) {
                 var parsedData = JSON.parse(data);
 
-                test = parsedData.agentSessionLocation.link["@href"].split("/")[parsedData.agentSessionLocation.link["@href"].split("/").length - 1];
+                agentSession = parsedData.agentSessionLocation.link["@href"].split("/")[parsedData.agentSessionLocation.link["@href"].split("/").length - 1];
+                chat.incomingchatrequest(accountnumber, agentSession);
 
-                console.log(test);
-
-                //var agentSessionId = 
             },
             error: function () {
                 console.log("agentsession Error (API)")
@@ -92,13 +103,40 @@ var chat = {
                 url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/incomingRequests?v=1&NC=true",
                 method: "GET",
                 body: "",
-                token: ""
+                token: globalToken
+            },
+            success: function (data) {
+                var incomingData = JSON.parse(data);
+                $("#no-incoming").text(incomingData.incomingRequests.ringingCount);
+                if (parseInt(incomingData.incomingRequests.ringingCount) > 0) {
+                    $("#btn-accept-chat").prop("disabled", false);
+                }
+                else {
+                    $("#btn-accept-chat").prop("disabled", true);
+                }
+                setTimeout(function () { chat.incomingchatrequest(accountnumber, agentsessionid); }, 1000);
+                console.log(JSON.parse(data));
+            },
+            error: function () {
+                console.log("Incoming Chat Request Error (API)")
+                setTimeout(function () { chat.incomingchatrequest(accountnumber, agentsessionid); }, 1000);
+            }
+        });
+    },
+    acceptchatrequest: function (accountnumber, agentsessionid) {
+        $.ajax({
+            url: "/LiveChat/api/v1/chats",
+            data: {
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/incomingRequests?v=1&NC=true",
+                method: "POST",
+                body: "",
+                token: globalToken
             },
             success: function (data) {
                 console.log(JSON.parse(data));
             },
             error: function () {
-                console.log("Login Error (API)")
+                console.log("Accept Chat Error (API)")
             }
         });
     },
