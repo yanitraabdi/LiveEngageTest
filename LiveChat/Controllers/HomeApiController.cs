@@ -24,7 +24,10 @@ namespace LiveChat.Controllers
                 httpWebReq.PreAuthenticate = true;
                 if (!string.IsNullOrEmpty(token))
                     httpWebReq.Headers.Add("Authorization", "Bearer " + token);
-                httpWebReq.ContentType = "application/json";
+                if (method == "POST" && string.IsNullOrEmpty(body))
+                    httpWebReq.ContentType = "application/xml";
+                else
+                    httpWebReq.ContentType = "application/json";
                 httpWebReq.Accept = "application/json";
                 httpWebReq.Method = method;
                 if (!string.IsNullOrEmpty(body))
