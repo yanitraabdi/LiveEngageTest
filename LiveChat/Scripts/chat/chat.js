@@ -1,4 +1,5 @@
 ﻿var globalToken = "";
+var test = "";
 
 $(document).ready(function () {
     $("#panelLogin").show();
@@ -12,9 +13,6 @@ $(document).ready(function () {
         }
 
         chat.login($("#tbAccountNumber").val(), $("#tbUsername").val(), $("#tbPassword").val());
-
-        $("#panelLogin").hide();
-        $("#panelTable").show();
 
         return false;
     });
@@ -30,9 +28,7 @@ var chat = {
                 body: '{ "username" : "' + username + '", "password" : "' + password + '"  }',
                 token: ""
             },
-            success: function (data, xhr) {
-                console.log(xhr.status);
-
+            success: function (data) {
                 var parsedData = JSON.parse(data);
 
                 $("#spanName").text(parsedData.config.loginName);
@@ -40,6 +36,9 @@ var chat = {
                 globalToken = parsedData.bearer;
 
                 chat.agentsession(accountnumber, globalToken);
+
+                $("#panelLogin").hide();
+                $("#panelTable").show();
             },
             error: function () {
                 console.log("Login Error (API)")
@@ -56,7 +55,13 @@ var chat = {
                 token: token
             },
             success: function (data) {
-                console.log(JSON.parse(data));
+                var parsedData = JSON.parse(data);
+
+                test = parsedData.agentSessionLocation.link["@href"].split("/")[parsedData.agentSessionLocation.link["@href"].split("/").length - 1];
+
+                console.log(test);
+
+                //var agentSessionId = 
             },
             error: function () {
                 console.log("agentsession Error (API)")
