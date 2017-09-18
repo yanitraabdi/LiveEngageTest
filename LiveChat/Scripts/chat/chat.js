@@ -147,7 +147,7 @@ var chat = {
                 url: "https://sy.agentvep.liveperson.net/api/account/" + accountnumber + "/agentSession/" + agentsessionid + "/chat/" + chatid + "/info/events?v=1&NC=true",
                 method: "POST",
                 body: '{ "event": { "@type": "line", "text": "<div dir="ltr" style="direction: ltr; text-align: left;">this is a line of text</div>", "textType": "html"  }',
-                token: ""
+                token: globalToken
             },
             success: function (data) {
                 console.log(JSON.parse(data));
