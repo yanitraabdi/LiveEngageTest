@@ -46,12 +46,20 @@ namespace LiveChat.Controllers
 
                 responseStream.Close();
                 webRes.Close();
+                return Ok(json);
             }
             catch (Exception ex)
             {
                 json = ex.Message;
+                if (ex.GetType() == typeof(UnauthorizedAccessException))
+                {
+                    return Unauthorized();
+                }
+                else {
+                    return InternalServerError(ex);
+                }  
             }
-            return Ok(json);
+            
         }
     }
 }
