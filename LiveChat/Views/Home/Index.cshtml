@@ -3,7 +3,6 @@
 }
 
 <script src="https://use.fontawesome.com/45e03a14ce.js"></script>
-<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 
 <div class="col-sm-12 box-fix" style="margin-top: 50px;">
     <form id="panelLogin">
@@ -40,7 +39,7 @@
 
             <div class="panel-footer" style="padding:10px">
                 <div class="text-center">
-                    <button class="k-button" id="btn-login"><i class="fa fa-search" aria-hidden="true"></i> Login</button>
+                    <button class="k-button btn btn-primary" id="btn-login"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</button>
                 </div>
             </div>
         </div>
@@ -62,13 +61,13 @@
                             </div>
                             <div id="custom-search-input">
                                 <div class="input-group col-md-12">
-                                    <input type="text" class="search-query form-control" placeholder="Conversation" />
+                                    @*<input type="text" class="search-query form-control" placeholder="Conversation" />
                                     <button class="btn btn-danger" type="button">
                                         <span class="glyphicon glyphicon-search"></span>
-                                    </button>
+                                    </button>*@
                                 </div>
                             </div>
-                            <div class="dropdown all_conversation">
+                            @*<div class="dropdown all_conversation">
                                 <button class="dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa fa-weixin" aria-hidden="true"></i>
                                     All Conversations
@@ -87,7 +86,7 @@
                                     <li><a href="#">Something else here</a></li>
                                     <li><a href="#">Separated link</a></li>
                                 </ul>
-                            </div>
+                            </div>*@
                             <div class="member_list">
                                 <ul class="list-unstyled" id="divChatList">
                                     @*<li class="left clearfix">
@@ -116,7 +115,7 @@
                         <div class="row">
                             <div class="new_message_head">
                                 @*<div class="pull-left"><button><i class="fa fa-plus-square-o" aria-hidden="true"></i> New Message</button></div><div class="pull-right">*@
-                                <h3>Hello, <span id="spanName"></span></h3>
+                                <h4>Hello, <span id="spanName"></span></h4>
                                 @*<div class="dropdown">
                                         <button class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fa fa-cogs" aria-hidden="true"></i>  Setting
@@ -157,10 +156,10 @@
                                 <textarea class="form-control" placeholder="type a message" id="txtMessage"></textarea>
                             <div class="clearfix"></div>
                             <div class="chat_bottom">
-                                <a href="#" class="pull-left upload_btn">
+                                @*<a href="#" class="pull-left upload_btn">
                                     <i class="fa fa-cloud-upload" aria-hidden="true"></i>
                                     Add Files
-                                </a>
+                                </a>*@
                                     <button id="btnSend" class="btn btn-success pull-right">Send</button>
                                 </div>
                             </div>

@@ -106,8 +106,9 @@ var chat = {
                 $("#divChatList").html("");
 
                 $.each(parsedData.chats.chat, function (i, obj) {
-                    divChatList.innerHTML += '<li class="left clearfix" id="' + obj.info.chatSessionKey + '"><span class="chat-img pull-left"><img src="http://www.joomilak.com/media/com_easydiscuss/images/default_avatar.png" alt="User Avatar" class="img-circle"></span><div class="chat-body clearfix" ><div class="header_sec"><strong class="primary-font">' + obj.info.visitorName + '</strong> <strong class="pull-right">' + moment(obj.info.lastUpdate).format("HH:mm") + '</strong></div><div class="contact_sec">' + obj.info.visitorId + '<span class="badge pull-right">3</span></div>';
-                    $("#" + obj.info.chatSessionKey).click(function () { currentChatId = obj.info.chatSessionKey; })
+                    divChatList.innerHTML += '<li class="left clearfix" id="' + obj.info.chatSessionKey + '" onclick="setChatId(\''+obj.info.chatSessionKey+'\')"><span class="chat-img pull-left"><img src="http://www.joomilak.com/media/com_easydiscuss/images/default_avatar.png" alt="User Avatar" class="img-circle"></span><div class="chat-body clearfix" ><div class="header_sec"><strong class="primary-font">' + obj.info.visitorName + '</strong> <strong class="pull-right">' + moment(obj.info.lastUpdate).format("HH:mm") + '</strong></div><div class="contact_sec">' + obj.info.visitorId + '</div>';
+                    //<span class="badge pull-right">3</span> ----------------- untuk unread message
+                    //$("#" + obj.info.chatSessionKey).click(function () { currentChatId = obj.info.chatSessionKey; })
                 });
 
             },
@@ -134,6 +135,15 @@ var chat = {
                 else {
                     $("#btn-accept-chat").prop("disabled", true);
                 }
+
+                if (currentChatId == "") {
+                    $("#txtMessage").prop('disabled', true);
+                    $("#btnSend").prop('disabled', true);
+                } else {
+                    $("#txtMessage").prop('disabled', false);
+                    $("#btnSend").prop('disabled', false);
+                }
+
                 setTimeout(function () { chat.incomingchatrequest(accountnumber, agentsessionid); }, 1000);
                 console.log(JSON.parse(data));
             },
@@ -166,16 +176,18 @@ var chat = {
         $.ajax({
             url: "/LiveChat/api/v1/chats",
             data: {
-                url: "https://sy.agentvep.liveperson.net/api/account/" + accountNumber + "/agentSession/" + agentSession + "/chat/" + chatid + "/info/events?v=1&NC=true",
+                url: "https://sy.agentvep.liveperson.net/api/account/" + accountNumber + "/agentSession/" + agentSession + "/chat/" + chatid + "/events?v=1&NC=true",
                 method: "POST",
-                body: '{ "event": { "@type": "line", "text": "' + message + '", "textType": "html"  }',
+                body: '{ "event": { "@type": "line", "text": "<span dir=\'ltr\' style=\'direction: ltr; text-align: left;\'>' + message + '</span>", "textType": "html"  } }',
                 token: globalToken
             },
             success: function (data) {
                 console.log(JSON.parse(data));
                 var parsedData = JSON.parse(data);
 
-                var divChatArea = document.getElementById("divChatArea");
+                $("#txtMessage").val("");
+
+                var divChatArea = document.getElementById("chat-events");
 
                 $.each(parsedData.chats.chat, function (i, obj) {
                     divChatArea.innerHTML += '<li class="left clearfix admin_chat"><div class="row"><div class="chat-body1 clearfix col-xs-9"><p>' + message + '</p><div class="chat_time pull-left">' + moment().format("HH:mm") + '</div></div></div></li>';
@@ -236,11 +248,25 @@ var chat = {
                         //console.log('<li class="left clearfix ' + obj.source == "agent" ? "admin_chat" : "" + '"><span class="chat-img1 ' + obj.source == "agent" ? "pull-right" : "pull-left" + '"><img src="' + obj.source == "agent" ? "https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg" : "http://www.joomilak.com/media/com_easydiscuss/images/default_avatar.png" + '" alt="User Avatar" class="img-circle"></span><div class="chat-body1 clearfix"><p>' + obj.text + '</p><div class="chat_time ' + obj.source == "agent" ? "pull-left" : "pull-right" + '">' + moment(obj.time).format("HH:mm") + '</div></div></li>');
                         if (obj["@type"] == "line") {
                             if (obj.source == "agent")
-                                $("#chat-events").append('<li class="left clearfix admin_chat"><span class="chat-img1 pull-right"><img src="https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg" alt="User Avatar" class="img-circle"></span><div class="chat-body1 clearfix"><p>' + obj.text + '</p><div class="chat_time pull-left">' + moment(obj.time).format("HH:mm") + '</div></div></li>');
+                                $("#chat-events").append('<li class="left clearfix admin_chat"><div class="chat-body1 clearfix"><p>' + obj.text + '</p><div class="chat_time pull-right">' + moment(obj.time).format("HH:mm") + '</div></div></li>');
                             else
-                                $("#chat-events").append('<li class="left clearfix"><span class="chat-img1 pull-left"><img src="http://www.joomilak.com/media/com_easydiscuss/images/default_avatar.png" alt="User Avatar" class="img-circle"></span><div class="chat-body1 clearfix"><p>' + obj.text + '</p><div class="chat_time pull-right">' + moment(obj.time).format("HH:mm") + '</div></div></li>');
+                                $("#chat-events").append('<li class="left clearfix"><div class="chat-body1 clearfix"><p>' + obj.text + '</p><div class="chat_time pull-left">' + moment(obj.time).format("HH:mm") + '</div></div></li>');
+                        }
+                        else if (obj["@type"] == "state" && obj.state=="ended") {
+                            $("#chat-events").append('<li class="chat-end">Chat Ended</li>');
                         }
                     });
+
+                    if (currentChatId == "") {
+                        $("#txtMessage").prop('disabled', true);
+                        $("#btnSend").prop('disabled', true);
+                    } else {
+                        $("#txtMessage").prop('disabled', false);
+                        $("#btnSend").prop('disabled', false);
+                    }
+
+                    var objDiv = document.getElementById("chat-events");
+                    objDiv.scrollIntoView(false);
 
                     setTimeout(function () { chat.getchatevent(); }, 1000);
                 },
@@ -254,4 +280,14 @@ var chat = {
             setTimeout(function () { chat.getchatevent(); }, 1000);
         }
     }
+}
+
+function setChatId(chatId) {
+    currentChatId = chatId;
+    $.each($("#divChatList li"), function (i, elm) {
+        $(elm).css("background-color", "");
+        $(elm).css("color", "");
+    });
+    $("#" + chatId).css("background-color", "#2980b9");
+    $("#" + chatId).css("color", "#FFF");
 }
